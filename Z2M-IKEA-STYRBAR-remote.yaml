@@ -1,0 +1,93 @@
+blueprint:
+  name: Ikea Styrbar Remote
+  description: Control your lights with the IKEA STYRBAR remote. You can also set actions for the left and right button.
+  domain: automation
+  input:
+    remote:
+      name: Remote
+      description: The action entity of your Styrbar remote
+      selector:
+        entity:
+          domain: sensor
+    target_light:
+      name: Lights
+      description: The lights you want to control with the remote
+      selector:
+        target:
+          entity:
+            domain: light
+    button_left:
+      name: Left button
+      description: Action to run on left button press
+      default: []
+      selector:
+        action: {}
+    button_right:
+      name: right button
+      description: Action to run on right button press
+      default: []
+      selector:
+        action: {}
+trigger:
+  - platform: state
+    entity_id: !input 'remote'
+    attribute: action
+condition: []
+action:
+  - variables:
+      command: '{{ trigger.to_state.state }}'
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: '{{ command == ''on'' }}'
+        sequence:
+          - service: light.turn_on
+            target: !input 'target_light'
+      - conditions:
+          - condition: template
+            value_template: '{{ command == ''off'' }}'
+        sequence:
+          - service: light.turn_off
+            target: !input 'target_light'
+      - conditions:
+          - condition: template
+            value_template: '{{ command == ''brightness_move_down'' }}'
+        sequence:
+          - repeat:
+              until:
+                - condition: state
+                  entity_id: !input 'remote'
+                  state: brightness_stop
+                  attribute: action
+              sequence:
+                - service: light.turn_on
+                  data:
+                    brightness_step_pct: -10
+                    transition: 1
+                  target: !input 'target_light'
+                - delay: '1'
+      - conditions:
+          - condition: template
+            value_template: '{{ command == ''brightness_move_up'' }}'
+        sequence:
+          - repeat:
+              until:
+                - condition: state
+                  entity_id: !input 'remote'
+                  state: brightness_stop
+                  attribute: action
+              sequence:
+                - service: light.turn_on
+                  data:
+                    brightness_step_pct: +10
+                    transition: 1
+                  target: !input 'target_light'
+                - delay: '1'
+      - conditions:
+          - '{{ command == ''arrow_left_click'' }}'
+        sequence: !input 'button_left'
+      - conditions:
+          - '{{ command == ''arrow_right_click'' }}'
+        sequence: !input 'button_right'
+mode: restart
+max_exceeded: silent
