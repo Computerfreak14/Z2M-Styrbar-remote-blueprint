@@ -28,6 +28,25 @@ blueprint:
       default: []
       selector:
         action: {}
+    brightness:
+      name: Brightness
+      description: The brightness you want your lights to be when turning them on
+      default: 100
+      selector:
+        number:
+          min: 0.0
+          max: 100.0
+          mode: slider
+          step: 1.0
+          unit_of_measurement: '%'
+    force_brightness:
+      name: Force Brightness
+      description: Force the above set brightness when turning on the lamps?
+      default: false
+      selector:
+        boolean: {}
+      
+  source_url: https://raw.githubusercontent.com/Computerfreak14/Z2M-Styrbar-remote-blueprint/main/Z2M-IKEA-STYRBAR-remote.yaml
 trigger:
   - platform: state
     entity_id: !input 'remote'
@@ -41,8 +60,21 @@ action:
           - condition: template
             value_template: '{{ command == ''on'' }}'
         sequence:
-          - service: light.turn_on
-            target: !input 'target_light'
+          - choose:
+      - conditions: '{{ force_brightness }}'
+        sequence:
+        - service: light.turn_on
+          target: !input 'target_light'
+          data:
+            transition: 1
+            brightness_pct: !input 'brightness'
+            color_name: white
+        default:
+        - service: light.turn_on
+          target: !input 'target_light'
+          data:
+          transition: 1
+          color_name: white
       - conditions:
           - condition: template
             value_template: '{{ command == ''off'' }}'
