@@ -63,18 +63,18 @@ action:
           - choose:
             - conditions: '{{ force_brightness }}'
               sequence:
+              - service: light.turn_on
+                target: !input 'target_light'
+                data:
+                  transition: 1
+                  brightness_pct: !input 'brightness'
+                  color_name: white
+            default:
             - service: light.turn_on
               target: !input 'target_light'
               data:
                 transition: 1
-                brightness_pct: !input 'brightness'
                 color_name: white
-            default:
-          - service: light.turn_on
-            target: !input 'target_light'
-            data:
-              transition: 1
-              color_name: white
       - conditions:
           - condition: template
             value_template: '{{ command == ''off'' }}'
