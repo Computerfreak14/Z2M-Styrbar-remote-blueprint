@@ -5,10 +5,11 @@ blueprint:
   input:
     remote:
       name: Remote
-      description: The action entity of your Styrbar remote
+      description: IKEA remote to use
       selector:
-        entity:
-          domain: sensor
+        device:
+          integration: zha
+          manufacturer: IKEA of Sweden
     target_light:
       name: Lights
       description: The lights you want to control with the remote
@@ -46,15 +47,15 @@ blueprint:
       selector:
         boolean: {}
       
-  source_url: https://raw.githubusercontent.com/Computerfreak14/Z2M-Styrbar-remote-blueprint/main/Z2M-IKEA-STYRBAR-remote.yaml
+  source_url: https://raw.githubusercontent.com/Computerfreak14/Z2M-Styrbar-remote-blueprint/experimental-ZHA/Z2M-IKEA-STYRBAR-remote.yaml
 trigger:
-  - platform: state
-    entity_id: !input 'remote'
-    attribute: action
-condition: []
+  - platform: event
+    event_type: zha_event
+    event_data:
+      device_id: !input 'remote'
 action:
   - variables:
-      command: '{{ trigger.to_state.state }}'
+      command: '{{ trigger.event.data.command }}'
   - choose:
       - conditions:
           - condition: template
