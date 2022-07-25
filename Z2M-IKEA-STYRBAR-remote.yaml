@@ -3,6 +3,16 @@ blueprint:
   description: Control your lights with the IKEA STYRBAR remote. You can also set actions for the left and right button.
   domain: automation
   input:
+    transition_time:
+      name: Transition time
+      description: Transition time for the target lights in seconds
+      selector:
+        number:
+        min: 1.0
+        max: 60.0
+        mode: slider
+        step: 0.1
+        unit_of_measurement: 'sec'
     remote:
       name: Remote
       description: The action entity of your Styrbar remote
@@ -66,14 +76,14 @@ action:
               - service: light.turn_on
                 target: !input 'target_light'
                 data:
-                  transition: 1
+                  transition: !input transition_time
                   brightness_pct: !input 'brightness'
                   color_name: white
             default:
             - service: light.turn_on
               target: !input 'target_light'
               data:
-                transition: 1
+                transition: !input transition_time
                 color_name: white
       - conditions:
           - condition: template
@@ -81,6 +91,8 @@ action:
         sequence:
           - service: light.turn_off
             target: !input 'target_light'
+            data:
+              transition: !input transition_time
       - conditions:
           - condition: template
             value_template: '{{ command == ''brightness_move_down'' }}'
@@ -95,7 +107,7 @@ action:
                 - service: light.turn_on
                   data:
                     brightness_step_pct: -10
-                    transition: 1
+                    transition: !input transition_time
                   target: !input 'target_light'
                 - delay: '1'
       - conditions:
@@ -112,7 +124,7 @@ action:
                 - service: light.turn_on
                   data:
                     brightness_step_pct: +10
-                    transition: 1
+                    transition: !input transition_time
                   target: !input 'target_light'
                 - delay: '1'
       - conditions:
