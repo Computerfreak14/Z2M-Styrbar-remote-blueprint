@@ -8,11 +8,11 @@ blueprint:
       description: Transition time for the target lights in seconds
       selector:
         number:
-        min: 1.0
-        max: 60.0
-        mode: slider
-        step: 0.1
-        unit_of_measurement: 'sec'
+          min: 1.0
+          max: 60.0
+          mode: slider
+          step: 0.1
+          unit_of_measurement: 'sec'
     remote:
       name: Remote
       description: The action entity of your Styrbar remote
@@ -44,11 +44,11 @@ blueprint:
       default: 100
       selector:
         number:
-          min: 0.0
-          max: 100.0
-          mode: slider
-          step: 1.0
-          unit_of_measurement: '%'
+            min: 0.0
+            max: 100.0
+            mode: slider
+            step: 1.0
+            unit_of_measurement: '%'
     force_brightness:
       name: Force Brightness
       description: Force the above set brightness when turning on the lamps?
